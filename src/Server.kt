@@ -25,6 +25,12 @@ import java.util.logging.Logger
 import javax.crypto.AEADBadTagException
 import javax.imageio.ImageIO
 
+import org.eclipse.jetty.websocket.api.Session
+import org.eclipse.jetty.websocket.api.annotations.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import spark.Spark.webSocket
+
+
 fun server(state: MFDState) {
 
     val robot = Robot()
@@ -94,7 +100,12 @@ fun server(state: MFDState) {
         if (state.verbose) println("Not found - vJoy is Windows exclusive")
     }
 
-    if (state.verbose) println("> Creating endpoints")
+    if (state.verbose) println("> Creating websocket endpoints")
+
+    webSocket("/chat", ServerRealtime::class.java)
+    spark.Spark.init()
+
+    if (state.verbose) println("> Creating HTTP endpoints")
 
     Spark.get("/mfd") { req, res ->
         val json = JSONObject()
